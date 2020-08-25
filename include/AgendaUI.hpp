@@ -5,12 +5,13 @@
 #include <iostream>
 #include <string>
 
-class AgendaUI {
-   public:
+class AgendaUI
+{
+public:
     AgendaUI();
     void OperationLoop(void);
 
-   private:
+private:
     /**
      * constructor
      */
@@ -102,6 +103,10 @@ class AgendaUI {
      * show the meetings in the screen
      */
     void printMeetings(std::list<Meeting> t_meetings);
+
+    void requestQuitMeeting(void);
+    void addMeetingParticipator(void);
+    void removeMeetingParticipator(void);
     // dates
     std::string m_userName;
     std::string m_userPassword;

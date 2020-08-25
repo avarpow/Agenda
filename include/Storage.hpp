@@ -5,11 +5,13 @@
 #include <list>
 #include <memory>
 #include <string>
+#include <algorithm>
 #include "Meeting.hpp"
 #include "User.hpp"
 
-class Storage {
- private:
+class Storage
+{
+private:
   /**
   *   default constructor
   */
@@ -33,7 +35,7 @@ class Storage {
   */
   bool writeToFile(void);
 
- public:
+public:
   /**
   * get Instance of storage
   * @return the pointer of the instance
@@ -112,7 +114,7 @@ class Storage {
   */
   bool sync(void);
 
- private:
+private:
   static std::shared_ptr<Storage> m_instance;
   std::list<User> m_userList;
   std::list<Meeting> m_meetingList;
