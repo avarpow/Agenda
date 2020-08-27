@@ -4,7 +4,7 @@
 int day_in_month[13] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 bool isLeapYear(int year)
 {
-    if (year % 400 == 0 || ((year % 100 != 0) && (year & 4 == 0)))
+    if (year % 400 == 0 || ((year % 100 != 0) && (year % 4 == 0)))
     {
         return true;
     }
