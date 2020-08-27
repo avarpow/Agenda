@@ -14,7 +14,7 @@ Storage::Storage()
     {
         readFromFile();
     }
-    catch (const char* error_str)
+    catch (const char *error_str)
     {
         std::cout << error_str << std::endl;
     }
@@ -114,7 +114,6 @@ bool Storage::writeToFile(void)
 }
 std::shared_ptr<Storage> Storage::getInstance(void)
 {
-    std::cout<<"get storge instance"<<std::endl;
     if (m_instance == nullptr)
         return m_instance = std::shared_ptr<Storage>(new Storage());
 }
@@ -159,14 +158,16 @@ int Storage::updateUser(std::function<bool(const User &)> filter,
 int Storage::deleteUser(std::function<bool(const User &)> filter)
 {
     int ret_count = 0;
-    for(auto user:m_userList){
-        if(filter(user)){
+    for (auto user : m_userList)
+    {
+        if (filter(user))
+        {
             ret_count++;
         }
     }
     m_userList.remove_if(filter);
-    if(ret_count>0)
-        m_dirty=true;
+    if (ret_count > 0)
+        m_dirty = true;
     return ret_count;
 }
 void Storage::createMeeting(const Meeting &t_meeting)
@@ -207,14 +208,16 @@ int Storage::updateMeeting(std::function<bool(const Meeting &)> filter,
 int Storage::deleteMeeting(std::function<bool(const Meeting &)> filter)
 {
     int ret_count = 0;
-    for(auto meeting:m_meetingList){
-        if(filter(meeting)){
+    for (auto meeting : m_meetingList)
+    {
+        if (filter(meeting))
+        {
             ret_count++;
         }
     }
     m_meetingList.remove_if(filter);
-    if(ret_count>0)
-        m_dirty=true;
+    if (ret_count > 0)
+        m_dirty = true;
     return ret_count;
 }
 bool Storage::sync(void)
@@ -225,7 +228,7 @@ bool Storage::sync(void)
         {
             writeToFile();
         }
-        catch (const char* error)
+        catch (const char *error)
         {
             std::cout << error << std::endl;
         }

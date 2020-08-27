@@ -1,4 +1,6 @@
 #include "Meeting.hpp"
+#include <algorithm>
+
 Meeting::Meeting(const std::string &t_sponsor,
                  const std::vector<std::string> &t_participator,
                  const Date &t_startTime, const Date &t_endTime,
