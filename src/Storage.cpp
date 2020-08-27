@@ -115,7 +115,7 @@ bool Storage::writeToFile(void)
 std::shared_ptr<Storage> Storage::getInstance(void)
 {
     if (m_instance == nullptr)
-        return m_instance = std::make_shared<Storage>();
+        return m_instance = std::shared_ptr<Storage>(new Storage());
 }
 Storage::~Storage()
 {
@@ -124,11 +124,11 @@ Storage::~Storage()
 }
 void Storage::createUser(const User &t_user)
 {
-    if (std::find(m_userList.begin(), m_userList.end(), t_user) == m_userList.end())
-    {
-        m_userList.push_back(t_user);
-        m_dirty = true;
-    }
+    //if (std::find(m_userList.begin(), m_userList.end(), t_user) == m_userList.end())
+    //{
+    m_userList.push_back(t_user);
+    m_dirty = true;
+    //}
 }
 std::list<User> Storage::queryUser(std::function<bool(const User &)> filter) const
 {
@@ -175,11 +175,12 @@ int Storage::deleteUser(std::function<bool(const User &)> filter)
 }
 void Storage::createMeeting(const Meeting &t_meeting)
 {
-    if (std::find(m_meetingList.begin(), m_meetingList.end(), t_meeting) == m_meetingList.end())
-    {
-        m_meetingList.push_back(t_meeting);
-        m_dirty = true;
-    }
+
+    //if (std::find(m_meetingList.begin(), m_meetingList.end(), t_meeting) == m_meetingList.end())
+    //{
+    m_meetingList.push_back(t_meeting);
+    m_dirty = true;
+    // }
 }
 std::list<Meeting> Storage::queryMeeting(
     std::function<bool(const Meeting &)> filter) const
