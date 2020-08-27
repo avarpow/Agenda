@@ -16,7 +16,7 @@ class Path {
 
 // const char *Path::meetingPath = "/tmp/meetings.csv";
 // const char *Path::userPath = "/tmp/users.csv";
-const char *Path::meetingPath = "/t/meetings.csv";
-const char *Path::userPath = "/t/users.csv";
+const char *Path::meetingPath = "./t/meetings.csv";
+const char *Path::userPath = "./t/users.csv";
 
 #endif

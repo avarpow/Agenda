@@ -2,6 +2,7 @@
 #include <iostream>
 AgendaService::AgendaService()
 {
+    std::cout<<"service start"<<std::endl;
     startAgenda();
 }
 AgendaService::~AgendaService()
@@ -51,22 +52,30 @@ bool AgendaService::createMeeting(const std::string &userName, const std::string
     if (!Date::isValid(t_startDate) || !Date::isValid(t_endDate))
     {
         std::cout << "check time fail" << std::endl;
+        return false;
+    }
+    if(t_startDate>=t_endDate){
+        std::cout<<"meetings time error"<<std::endl;
+        return false;
     }
     auto title_fliter = [&title](Meeting t_meeting) { return t_meeting.getTitle() == title; };
     //check all register
     auto username_fliter = [&userName, &participator](User t_user) { 
         if(t_user.getName()==userName)
             return true; 
-        else{for (auto &part:participator){
-            if(t_user.getName()==part){
-                return true;
+        else{
+            for (auto &part:participator){
+                if(t_user.getName()==part){
+                    return true;
+                }
             }
+                return false;
         }
-        return false;
-    } };
-    auto time_fliter = [&t_startDate, &t_endDate](Meeting t_meeting) {
-        return !(t_startDate >= t_meeting.getEndDate() || t_endDate <= t_meeting.getStartDate());
     };
+    auto time_fliter = [&t_startDate, &t_endDate](Meeting t_meeting) {
+        return !((t_startDate >= t_meeting.getEndDate()) || (t_endDate <= t_meeting.getStartDate()));
+    };
+    
     if (m_storage->queryMeeting(title_fliter).empty() &&
         m_storage->queryUser(username_fliter).size() == (participator.size() + 1) &&
         m_storage->queryMeeting(time_fliter).empty())
@@ -125,7 +134,7 @@ std::list<Meeting> AgendaService::meetingQuery(const std::string &userName,
                                                const std::string &endDate) const
 {
     auto meeting_fliter = [&userName, &startDate, &endDate](const Meeting &t_meeting) {
-        return (!(t_meeting.getStartDate() > endDate) && !(t_meeting.getEndDate() > startDate)) && (t_meeting.getSponsor() == userName || t_meeting.isParticipator(userName));
+        return (!(t_meeting.getStartDate() > endDate) || !(t_meeting.getEndDate() > startDate)) && (t_meeting.getSponsor() == userName || t_meeting.isParticipator(userName));
     };
     return m_storage->queryMeeting(meeting_fliter);
 }

@@ -9,23 +9,25 @@ std::string ui_helper =
     "------------------------------------------------------------\n";
 std::string ui_logged_helper =
     "---------------------------Agenda---------------------------\n"
-    "o    - log out Agenda"
-    "dc   - delete Agenda account"
-    "lu   - list all Agenda user"
-    "cm   - create a meeting"
-    "amp  - add meeting participator"
-    "rmp  - remove meeting participator"
-    "rqm  - request to quit meeting"
-    "la   - list all meetings"
-    "las  - list all sponsor meetings"
-    "lap  - list all participator meetings"
-    "qm   - query meeting by title"
-    "qt   - query meeting by time interval"
-    "dm   - delete meeting by title"
-    "da   - delete all meetings"
+    "o    - log out Agenda\n"
+    "dc   - delete Agenda account\n"
+    "lu   - list all Agenda user\n"
+    "cm   - create a meeting\n"
+    "amp  - add meeting participator\n"
+    "rmp  - remove meeting participator\n"
+    "rqm  - request to quit meeting\n"
+    "la   - list all meetings\n"
+    "las  - list all sponsor meetings\n"
+    "lap  - list all participator meetings\n"
+    "qm   - query meeting by title\n"
+    "qt   - query meeting by time interval\n"
+    "dm   - delete meeting by title\n"
+    "da   - delete all meetings\n"
     "------------------------------------------------------------\n";
 AgendaUI::AgendaUI() : m_userName(""),
-                       m_userPassword("")
+                       m_userPassword(""),
+                       m_agendaService()
+
 {
     startAgenda();
 }
@@ -37,10 +39,11 @@ void AgendaUI::OperationLoop(void)
         if (m_userName == "")
         {
             cout << ui_helper;
+            op=getOperation();
             if (op == "q")
             {
                 quitAgenda();
-                return;
+                break;
             }
             else if (op == "l")
             {
@@ -54,6 +57,7 @@ void AgendaUI::OperationLoop(void)
         else
         {
             cout << ui_logged_helper;
+            op=getOperation();
             executeOperation(op);
         }
     }
@@ -121,10 +125,9 @@ void AgendaUI::userLogIn(void)
     cin >> username >> password;
     if (m_agendaService.userLogIn(username, password))
     {
-        m_userName == username;
-        m_userPassword == password;
+        m_userName = username;
+        m_userPassword = password;
         cout << module_str << "Succed!" << endl;
-        OperationLoop();
     }
     else
     {
@@ -171,7 +174,7 @@ void AgendaUI::listAllUsers(void)
     cout << module_str << "name\t\temail\t\tphone" << endl;
     for (auto user : user_list)
     {
-        cout << module_str << user.getName() << "\t\t" << user.getEmail() << "\t\t" << user.getPhone() << "\t\t";
+        cout << module_str << user.getName() << "\t\t" << user.getEmail() << "\t\t" << user.getPhone() << "\t\t"<<endl;
     }
 }
 void AgendaUI::createMeeting(void)
@@ -231,7 +234,8 @@ void AgendaUI::queryMeetingByTimeInterval(void)
 void AgendaUI::deleteMeetingByTitle(void)
 {
     string module_str = "[delete meeting] ";
-    cout << module_str;
+    cout << module_str << "[title]" <<endl;
+    cout << module_str ;
     m_agendaService.deleteMeeting(m_userName, []() -> string { string temp; cin>>temp; return temp; }());
     cout << module_str << "Succed!" << endl;
 }

@@ -14,7 +14,7 @@ Storage::Storage()
     {
         readFromFile();
     }
-    catch (std::string error_str)
+    catch (const char* error_str)
     {
         std::cout << error_str << std::endl;
     }
@@ -97,11 +97,11 @@ bool Storage::writeToFile(void)
     {
         char meeting_str[200];
 
-        file_user << [&meeting_str](Meeting t_meeting) -> std::string {
+        file_meeting << [&meeting_str](Meeting t_meeting) -> std::string {
             std::string participator_str;
             for (auto participator : t_meeting.getParticipator())
             {
-                participator_str += (participator + '&');
+                participator_str += (participator + "&");
             }
             participator_str.erase(participator_str.end() - 1);
 
@@ -114,6 +114,7 @@ bool Storage::writeToFile(void)
 }
 std::shared_ptr<Storage> Storage::getInstance(void)
 {
+    std::cout<<"get storge instance"<<std::endl;
     if (m_instance == nullptr)
         return m_instance = std::shared_ptr<Storage>(new Storage());
 }
@@ -158,19 +159,14 @@ int Storage::updateUser(std::function<bool(const User &)> filter,
 int Storage::deleteUser(std::function<bool(const User &)> filter)
 {
     int ret_count = 0;
-    for (auto iter = m_userList.begin(); iter != m_userList.end(); iter++)
-    {
-        if (filter(*iter))
-        {
-            m_userList.erase(iter);
+    for(auto user:m_userList){
+        if(filter(user)){
             ret_count++;
-            m_dirty = true;
-        }
-        else
-        {
-            iter++;
         }
     }
+    m_userList.remove_if(filter);
+    if(ret_count>0)
+        m_dirty=true;
     return ret_count;
 }
 void Storage::createMeeting(const Meeting &t_meeting)
@@ -211,19 +207,14 @@ int Storage::updateMeeting(std::function<bool(const Meeting &)> filter,
 int Storage::deleteMeeting(std::function<bool(const Meeting &)> filter)
 {
     int ret_count = 0;
-    for (auto iter = m_meetingList.begin(); iter != m_meetingList.end(); iter++)
-    {
-        if (filter(*iter))
-        {
-            m_meetingList.erase(iter);
+    for(auto meeting:m_meetingList){
+        if(filter(meeting)){
             ret_count++;
-            m_dirty = true;
-        }
-        else
-        {
-            iter++;
         }
     }
+    m_meetingList.remove_if(filter);
+    if(ret_count>0)
+        m_dirty=true;
     return ret_count;
 }
 bool Storage::sync(void)
@@ -234,7 +225,7 @@ bool Storage::sync(void)
         {
             writeToFile();
         }
-        catch (std::string error)
+        catch (const char* error)
         {
             std::cout << error << std::endl;
         }
