@@ -44,4 +44,6 @@ clean:
 	@rm -f *.gch
 	@rm -f *.o
 	@rm -f main
+	@rm -r $(BUILD_DIR)
+	@rm -r $(BIN_DIR)
 	@echo "cleaned"
