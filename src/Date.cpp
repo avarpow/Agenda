@@ -4,7 +4,7 @@
 int day_in_month[13] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 bool isLeapYear(int year)
 {
-    if (year % 400 == 0 || (year % 100 != 0 && year & 4 == 0))
+    if (year % 400 == 0 || ((year % 100 != 0) && (year & 4 == 0)))
     {
         return true;
     }
@@ -124,11 +124,14 @@ bool Date::isValid(const Date &t_date)
         return false;
     if (t_date.m_month < 1 || t_date.m_month > 12)
         return false;
-    if (!isValidDay(t_date.m_year, t_date.m_month, t_date.m_day))
-        return false;
     if (t_date.m_hour < 0 || t_date.m_hour > 23)
         return false;
     if (t_date.m_minute < 0 || t_date.m_month > 59)
+        return false;
+
+    if (isLeapYear(t_date.m_year) && t_date.m_month == 2 && t_date.m_day == 29)
+        return true;
+    if (t_date.m_day <= 0 || t_date.m_day > day_in_month[t_date.m_month])
         return false;
     return true;
 }
