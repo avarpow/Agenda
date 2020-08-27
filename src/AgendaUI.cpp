@@ -243,13 +243,50 @@ void AgendaUI::deleteAllMeetings(void)
 }
 void AgendaUI::printMeetings(std::list<Meeting> t_meetings)
 {
+    string module_str = "[print meeting] ";
+    cout << module_str << "title\t\tsponsor\t\tstart time\t\tend time\t\tparticipator" << endl;
+    for (auto &meeting : t_meetings)
+    {
+        cout << module_str << meeting.getTitle() << "\t\t" << meeting.getSponsor() << "\t\t" << Date::dateToString(meeting.getStartDate()) << "\t\t" << Date::dateToString(meeting.getEndDate()) << "\t\t"
+             << [&meeting]() {
+                    string ret;
+                    for (auto part : meeting.getParticipator())
+                    {
+                        ret += part + ",";
+                    }
+                    ret.erase(ret.end() - 1);
+                    return ret;
+                }()
+             << endl;
+    }
 }
 void AgendaUI::requestQuitMeeting(void)
 {
+    string module_str = "[quit meeting] ";
+    cout << module_str << "[meeting title]" << endl;
+    cout << module_str;
+    string meeting;
+    cin >> meeting;
+    m_agendaService.quitMeeting(m_userName, meeting);
+    cout << module_str << "Succed!" << endl;
 }
 void AgendaUI::addMeetingParticipator(void)
 {
+    string module_str = "[add participator] ";
+    cout << module_str << "[meeting title] [participator username]";
+    cout << module_str;
+    string title, user;
+    cin >> title >> user;
+    m_agendaService.addMeetingParticipator(m_userName, title, user);
+    cout << module_str << "Succed!" << endl;
 }
 void AgendaUI::removeMeetingParticipator(void)
 {
+    string module_str = "[remove participator] ";
+    cout << module_str << "[meeting title] [participator username]";
+    cout << module_str;
+    string title, user;
+    cin >> title >> user;
+    m_agendaService.addMeetingParticipator(m_userName, title, user);
+    cout << module_str << "Succed!" << endl;
 }
