@@ -126,7 +126,7 @@ bool Date::isValid(const Date &t_date)
         return false;
     if (t_date.m_hour < 0 || t_date.m_hour > 23)
         return false;
-    if (t_date.m_minute < 0 || t_date.m_month > 59)
+    if (t_date.m_minute < 0 || t_date.m_minute > 59)
         return false;
 
     if (isLeapYear(t_date.m_year) && t_date.m_month == 2 && t_date.m_day == 29)
