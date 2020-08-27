@@ -23,7 +23,7 @@ bool isValidDay(int year, int month, int day)
         day_in_month[2] = 29;
     else
         day_in_month[2] = 28;
-    if (day > 0 && day < day_in_month[month])
+    if (day > 0 && day <= day_in_month[month])
         return true;
     else
         return false;
@@ -93,7 +93,7 @@ void Date::setYear(const int t_year)
 }
 int Date::getMonth(void) const
 {
-    return m_year;
+    return m_month;
 }
 void Date::setMonth(const int t_month)
 {
@@ -109,7 +109,7 @@ void Date::setDay(const int t_day)
 }
 int Date::getHour(void) const
 {
-    return m_day;
+    return m_hour;
 }
 void Date::setHour(const int t_hour)
 {
