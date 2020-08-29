@@ -135,7 +135,7 @@ bool AgendaService::createMeeting(const std::string &userName, const std::string
     //check participater avaliable
     for (auto &part : participator)
     {
-        auto meet_list = listAllMeetings(part);
+        auto meet_list = listAllParticipateMeetings(part);
         for (auto &meet : meet_list)
         {
             if (!(meet.getStartDate() >= endDate || meet.getEndDate() <= startDate))
