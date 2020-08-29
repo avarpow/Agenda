@@ -133,9 +133,9 @@ bool AgendaService::createMeeting(const std::string &userName, const std::string
     }
 
     //check participater avaliable
-    for (auto &part : participator)
+    /*for (auto &part : participator)
     {
-        auto meet_list = listAllParticipateMeetings(part);
+        auto meet_list = listAllMeetings(part);
         for (auto &meet : meet_list)
         {
             if (!(meet.getStartDate() >= endDate || meet.getEndDate() <= startDate))
@@ -144,6 +144,15 @@ bool AgendaService::createMeeting(const std::string &userName, const std::string
             }
         }
     }
+    //check sponsor avalible
+    auto sp_meet_list = listAllMeetings(userName);
+    for (auto &meet : sp_meet_list)
+    {
+        if (!(meet.getStartDate() >= endDate || meet.getEndDate() <= startDate))
+        {
+            return false;
+        }
+    }*/
 
     m_storage->createMeeting(Meeting(userName, participator, t_startDate, t_endDate, title));
     return true;
