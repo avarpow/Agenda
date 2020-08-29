@@ -285,12 +285,12 @@ std::list<Meeting> AgendaService::meetingQuery(const std::string &userName,
     std::list<Meeting> ret;
     Date start = Date::stringToDate(startDate);
     Date end = Date::stringToDate(endDate);
-    if ((!Date::isValid(start)) || (!Date::isValid(end)) || (start >= end))
+    if ((!Date::isValid(start)) || (!Date::isValid(end)) || (start > end))
         return ret;
     auto meeting_fliter = [&](const Meeting &t_meeting) {
         if (t_meeting.getSponsor() == userName || t_meeting.isParticipator(userName))
         {
-            if ((t_meeting.getStartDate() >= start && t_meeting.getEndDate() <= end) || (t_meeting.getStartDate() <= start && t_meeting.getEndDate() >= start) || (t_meeting.getStartDate() <= end && t_meeting.getEndDate() >= end) || (t_meeting.getStartDate() <= start && t_meeting.getEndDate() >= end))
+            if (!(t_meeting.getEndDate() < start || t_meeting.getStartDate() > end))
                 return true;
         }
         return false;
