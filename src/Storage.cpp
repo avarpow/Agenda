@@ -10,7 +10,7 @@
 std::shared_ptr<Storage> Storage::m_instance = nullptr;
 Storage::Storage()
 {
-    try
+    /* try
     {
         readFromFile();
     }
@@ -18,6 +18,9 @@ Storage::Storage()
     {
         std::cout << error_str << std::endl;
     }
+    m_dirty = false;
+    */
+    readFromFile();
     m_dirty = false;
 }
 bool Storage::readFromFile(void)
@@ -121,7 +124,8 @@ bool Storage::writeToFile(void)
 std::shared_ptr<Storage> Storage::getInstance(void)
 {
     if (m_instance == nullptr)
-        return m_instance = std::shared_ptr<Storage>(new Storage());
+        m_instance.reset(new Storage());
+    return m_instance;
 }
 Storage::~Storage()
 {
@@ -171,7 +175,8 @@ int Storage::deleteUser(std::function<bool(const User &)> filter)
             ret_count++;
         }
     }
-    m_userList.remove_if(filter);
+    auto list_end = remove_if(m_userList.begin(), m_userList.end(), filter);
+    m_userList.erase(list_end, m_userList.end());
     if (ret_count > 0)
         m_dirty = true;
     return ret_count;
@@ -221,7 +226,8 @@ int Storage::deleteMeeting(std::function<bool(const Meeting &)> filter)
             ret_count++;
         }
     }
-    m_meetingList.remove_if(filter);
+    auto list_end = remove_if(m_meetingList.begin(), m_meetingList.end(), filter);
+    m_meetingList.erase(list_end, m_meetingList.end());
     if (ret_count > 0)
         m_dirty = true;
     return ret_count;
@@ -230,7 +236,7 @@ bool Storage::sync(void)
 {
     if (m_dirty)
     {
-        try
+        /*try
         {
             writeToFile();
         }
@@ -238,6 +244,9 @@ bool Storage::sync(void)
         {
             std::cout << error << std::endl;
         }
+        m_dirty = false;
+        return true;
+        */
         m_dirty = false;
         return true;
     }
