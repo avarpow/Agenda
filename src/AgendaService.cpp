@@ -140,19 +140,21 @@ bool AgendaService::removeMeetingParticipator(const std::string &userName,
 }
 bool AgendaService::quitMeeting(const std::string &userName, const std::string &title)
 {
-    auto meeting_fliter = [&title, &userName](const Meeting &t_meeting) {
-        return t_meeting.getTitle() == title && t_meeting.isParticipator(userName);
-    };
-    auto meeting_switcher = [&userName](Meeting &t_meeting) {
-        t_meeting.removeParticipator(userName);
-    };
-
-    if (m_storage->updateMeeting(meeting_fliter, meeting_switcher) != 0)
+    auto list_meetings = m_storage->queryMeeting([&](const Meeting &t_meeting) {
+        return t_meeting.isParticipator(userName) && t_meeting.getTitle() == title;
+    });
+    if (list_meetings.empty())
     {
-        auto empty_meeting = [](const Meeting &meeting) {
-            return meeting.getParticipator().size() == 0;
-        };
-        m_storage->deleteMeeting(empty_meeting);
+        return false;
+    }
+    else
+    {
+        list_meetings.front().removeParticipator(userName);
+        auto d_title = list_meetings.front().getTitle();
+        if (list_meetings.front().getParticipator().size() == 0)
+        {
+            m_storage->deleteMeeting([&](const Meeting t_meeting) { return t_meeting.getTitle() == d_title; });
+        }
     }
     return true;
 }
@@ -168,10 +170,12 @@ std::list<Meeting> AgendaService::meetingQuery(const std::string &userName,
                                                const std::string &startDate,
                                                const std::string &endDate) const
 {
-    if (!Date::isValid(startDate) || !Date::isValid(endDate) || startDate >= endDate)
+    Date start = Date(startDate);
+    Date end = Date(endDate);
+    if (!Date::isValid(start) || !Date::isValid(end) || start >= end)
         return std::list<Meeting>();
-    auto meeting_fliter = [&userName, &startDate, &endDate](const Meeting &t_meeting) {
-        return (!(t_meeting.getStartDate() > endDate) && !(t_meeting.getEndDate() < startDate)) && (t_meeting.getSponsor() == userName || t_meeting.isParticipator(userName));
+    auto meeting_fliter = [&userName, &start, &end](const Meeting &t_meeting) {
+        return ((t_meeting.getStartDate() >= start && t_meeting.getEndDate() <= end) && (t_meeting.getSponsor() == userName || t_meeting.isParticipator(userName)));
     };
     return m_storage->queryMeeting(meeting_fliter);
 }
