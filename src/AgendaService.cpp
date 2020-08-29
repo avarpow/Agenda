@@ -130,10 +130,7 @@ bool AgendaService::createMeeting(const std::string &userName, const std::string
     //check participater avaliable
     for (auto &part : participator)
     {
-        auto time_fliter = [&part, &t_startDate, &t_endDate](Meeting t_meeting) {
-            return (!((t_startDate >= t_meeting.getEndDate()) || (t_endDate <= t_meeting.getStartDate())) && t_meeting.isParticipator(part));
-        };
-        if (!(m_storage->queryMeeting(time_fliter).empty()))
+        if (!meetingQuery(part, startDate, endDate).empty())
         {
             return false;
         }
