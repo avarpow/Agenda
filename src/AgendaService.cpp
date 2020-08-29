@@ -135,6 +135,11 @@ bool AgendaService::createMeeting(const std::string &userName, const std::string
             return false;
         }
     }
+    //check sponser avalible
+    if (!meetingQuery(userName, startDate, endDate).empty())
+    {
+        return false;
+    }
 
     m_storage->createMeeting(Meeting(userName, participator, t_startDate, t_endDate, title));
     return true;
