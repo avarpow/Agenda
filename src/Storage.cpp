@@ -57,7 +57,8 @@ bool Storage::readFromFile(void)
         std::regex_match(meeting_buf, result_meeting, meeting_pattern);
         if (result_meeting.size() != 6)
         {
-            throw "file format illegal";
+            //throw "file format illegal";
+            return false;
         }
         //split meeting parcitopator
         std::vector<std::string> meeting_parcitopator;
@@ -88,7 +89,7 @@ bool Storage::writeToFile(void)
     //write user file
     for (auto user : m_userList)
     {
-        char user_str[200];
+        char user_str[400];
         file_user << [&user_str](User t_user) -> std::string {
             sprintf(user_str, "\"%s\",\"%s\",\"%s\",\"%s\"", t_user.getName().c_str(), t_user.getPassword().c_str(), t_user.getEmail().c_str(), t_user.getPhone().c_str()); //test pass @8/25 2:50AM
             return std::string(user_str);
@@ -98,7 +99,7 @@ bool Storage::writeToFile(void)
     //write meeting file
     for (auto meeting : m_meetingList)
     {
-        char meeting_str[200];
+        char meeting_str[400];
 
         file_meeting << [&meeting_str](Meeting t_meeting) -> std::string {
             std::string participator_str;
@@ -161,7 +162,7 @@ int Storage::updateUser(std::function<bool(const User &)> filter,
 int Storage::deleteUser(std::function<bool(const User &)> filter)
 {
     int ret_count = 0;
-    for (auto user : m_userList)
+    for (auto &user : m_userList)
     {
         if (filter(user))
         {

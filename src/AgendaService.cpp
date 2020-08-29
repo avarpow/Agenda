@@ -2,7 +2,7 @@
 #include <iostream>
 AgendaService::AgendaService()
 {
-    std::cout << "service start" << std::endl;
+    //std::cout << "service start" << std::endl;
     startAgenda();
 }
 AgendaService::~AgendaService()
@@ -31,19 +31,17 @@ bool AgendaService::userRegister(const std::string &userName, const std::string 
 }
 bool AgendaService::deleteUser(const std::string &userName, const std::string &password)
 {
-    if (userLogIn(userName, password))
+
+    // delete sponsor meeting
+    deleteAllMeetings(userName);
+    //delete part meeting
+    auto part_meeting = listAllParticipateMeetings(userName);
+    for (auto meeting : part_meeting)
     {
-        // delete sponsor meeting
-        deleteAllMeetings(userName);
-        auto part_meeting = listAllParticipateMeetings(userName);
-        for (auto meeting : part_meeting)
-        {
-            quitMeeting(userName, meeting.getTitle());
-        }
-        m_storage->deleteUser([&userName](User t_user) { return t_user.getName() == userName; });
-        return true;
+        quitMeeting(userName, meeting.getTitle());
     }
-    return false;
+    m_storage->deleteUser([&userName, &password](const User &t_user) { return t_user.getName() == userName && t_user.getPassword() == password; });
+    return true;
 }
 std::list<User> AgendaService::listAllUsers(void) const
 {
@@ -173,7 +171,7 @@ std::list<Meeting> AgendaService::meetingQuery(const std::string &userName,
     if (!Date::isValid(startDate) || !Date::isValid(endDate) || startDate > endDate)
         return std::list<Meeting>();
     auto meeting_fliter = [&userName, &startDate, &endDate](const Meeting &t_meeting) {
-        return (!(t_meeting.getStartDate() > endDate) && !(t_meeting.getEndDate() > startDate)) && (t_meeting.getSponsor() == userName || t_meeting.isParticipator(userName));
+        return (!(t_meeting.getStartDate() > endDate) && !(t_meeting.getEndDate() < startDate)) && (t_meeting.getSponsor() == userName || t_meeting.isParticipator(userName));
     };
     return m_storage->queryMeeting(meeting_fliter);
 }
