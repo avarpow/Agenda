@@ -107,10 +107,10 @@ bool AgendaService::addMeetingParticipator(const std::string &userName,
         return false;
 
     //check merting exist
-    auto meeting_fliter = [&title](const Meeting t_meeting) {
+    auto meeting_title_fliter = [&title](const Meeting t_meeting) {
         return t_meeting.getTitle() == title;
     };
-    auto meeting_list = m_storage->queryMeeting(meeting_fliter);
+    auto meeting_list = m_storage->queryMeeting(meeting_title_fliter);
     if (meeting_list.empty())
         return false;
     auto the_meeting = meeting_list.front();
