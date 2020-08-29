@@ -288,7 +288,7 @@ std::list<Meeting> AgendaService::meetingQuery(const std::string &userName,
     if ((!Date::isValid(start)) || (!Date::isValid(end)) || (start >= end))
         return ret;
     auto meeting_fliter = [&](const Meeting &t_meeting) {
-        if (t_meeting.getStartDate() >= start && t_meeting.getEndDate() <= end)
+        if (t_meeting.getSponsor() == userName || t_meeting.isParticipator(userName))
         {
             if ((t_meeting.getStartDate() >= start && t_meeting.getEndDate() <= end) || (t_meeting.getStartDate() <= start && t_meeting.getEndDate() >= start) || (t_meeting.getStartDate() <= end && t_meeting.getEndDate() >= end) || (t_meeting.getStartDate() <= start && t_meeting.getEndDate() >= end))
                 return true;
