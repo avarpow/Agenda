@@ -10,7 +10,7 @@
 std::shared_ptr<Storage> Storage::m_instance = nullptr;
 Storage::Storage()
 {
-    /* try
+    try
     {
         readFromFile();
     }
@@ -19,13 +19,12 @@ Storage::Storage()
         std::cout << error_str << std::endl;
     }
     m_dirty = false;
-    */
     readFromFile();
     m_dirty = false;
 }
 bool Storage::readFromFile(void)
 {
-    /*std::fstream file_meeting, file_user;
+    std::fstream file_meeting, file_user;
     file_meeting.open(Path::meetingPath, std::ios::in);
     file_user.open(Path::userPath, std::ios::in);
     if (!file_meeting.is_open() || !file_user.is_open())
@@ -79,12 +78,11 @@ bool Storage::readFromFile(void)
         createMeeting(Meeting(result_meeting[1], meeting_parcitopator, Date::stringToDate(result_meeting[3]), Date::stringToDate(result_meeting[4]), result_meeting[5]));
     }
     file_meeting.close();
-    return true;*/
     return true;
 }
 bool Storage::writeToFile(void)
 {
-    /*std::fstream file_meeting, file_user;
+    std::fstream file_meeting, file_user;
     file_meeting.open(Path::meetingPath, std::ios::out);
     file_user.open(Path::userPath, std::ios::out);
     if (!file_user.is_open() || !file_meeting.is_open())
@@ -118,7 +116,6 @@ bool Storage::writeToFile(void)
         }(meeting) << std::endl;
     }
     file_meeting.close();
-    return true;*/
     return true;
 }
 std::shared_ptr<Storage> Storage::getInstance(void)
@@ -236,7 +233,7 @@ bool Storage::sync(void)
 {
     if (m_dirty)
     {
-        /*try
+        try
         {
             writeToFile();
         }
@@ -244,9 +241,6 @@ bool Storage::sync(void)
         {
             std::cout << error << std::endl;
         }
-        m_dirty = false;
-        return true;
-        */
         m_dirty = false;
         return true;
     }
