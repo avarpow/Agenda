@@ -100,45 +100,49 @@ bool AgendaService::createMeeting(const std::string &userName, const std::string
         return false;
     }
     auto title_fliter = [&title](Meeting t_meeting) { return t_meeting.getTitle() == title; };
-    //check all register
-    auto username_fliter = [&userName, &participator](User t_user) {
-        if (t_user.getName() == userName)
-            return true;
-        else
-        {
-            for (auto &part : participator)
-            {
-                if (t_user.getName() == part)
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-    };
+    //check part exist
+    if (participator.size() == 0)
+    {
+        return false;
+    }
 
     //check title unique
-    if (!m_storage->queryMeeting(title_fliter).empty())
+    if (!(m_storage->queryMeeting(title_fliter).empty()))
     {
         return false;
     }
     //check user all register
-    if (m_storage->queryUser(username_fliter).size() != (participator.size() + 1))
+    auto username_fliter = [&userName](User t_user) {
+        if (t_user.getName() == userName)
+            return true;
+    };
+    if (m_storage->queryUser(username_fliter).size() != 1)
     {
         return false;
     }
-    //check participater avaliable
     for (auto &part : participator)
     {
-        if (!(meetingQuery(part, startDate, endDate).empty()))
+        auto part_fliter = [&part](User t_user) {
+            if (t_user.getName() == part)
+                return true;
+        };
+        if (m_storage->queryUser(part_fliter).size() != 1)
         {
             return false;
         }
     }
-    //check sponser avalible
-    if (!(meetingQuery(userName, startDate, endDate).empty()))
+
+    //check participater avaliable
+    for (auto &part : participator)
     {
-        return false;
+        auto meet_list = listAllMeetings(part);
+        for (auto &meet : meet_list)
+        {
+            if (!(meet.getStartDate() >= endDate || meet.getEndDate() <= startDate))
+            {
+                return false;
+            }
+        }
     }
 
     m_storage->createMeeting(Meeting(userName, participator, t_startDate, t_endDate, title));
