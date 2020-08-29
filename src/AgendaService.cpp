@@ -112,7 +112,7 @@ bool AgendaService::createMeeting(const std::string &userName, const std::string
         return false;
     }
     //check user all register
-    auto username_fliter = [&userName](User t_user) {
+    /*auto username_fliter = [&userName](User t_user) {
         if (t_user.getName() == userName)
             return true;
     };
@@ -130,7 +130,7 @@ bool AgendaService::createMeeting(const std::string &userName, const std::string
         {
             return false;
         }
-    }
+    }*/
 
     //check participater avaliable
     /*for (auto &part : participator)
