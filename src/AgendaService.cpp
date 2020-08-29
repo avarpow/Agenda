@@ -130,13 +130,13 @@ bool AgendaService::createMeeting(const std::string &userName, const std::string
     //check participater avaliable
     for (auto &part : participator)
     {
-        if (!meetingQuery(part, startDate, endDate).empty())
+        if (!(meetingQuery(part, startDate, endDate).empty()))
         {
             return false;
         }
     }
     //check sponser avalible
-    if (!meetingQuery(userName, startDate, endDate).empty())
+    if (!(meetingQuery(userName, startDate, endDate).empty()))
     {
         return false;
     }
