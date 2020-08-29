@@ -282,14 +282,21 @@ std::list<Meeting> AgendaService::meetingQuery(const std::string &userName,
                                                const std::string &startDate,
                                                const std::string &endDate) const
 {
-    Date start = Date(startDate);
-    Date end = Date(endDate);
-    if (!Date::isValid(start) || !Date::isValid(end) || start >= end)
-        return std::list<Meeting>();
-    auto meeting_fliter = [&userName, &start, &end](const Meeting &t_meeting) {
-        return ((t_meeting.getStartDate() >= start && t_meeting.getEndDate() <= end) && (t_meeting.getSponsor() == userName || t_meeting.isParticipator(userName)));
+    std::list<Meeting> ret;
+    Date start = Date::stringToDate(startDate);
+    Date end = Date::stringToDate(endDate);
+    if ((!Date::isValid(start)) || (!Date::isValid(end)) || (start >= end))
+        return ret;
+    auto meeting_fliter = [&](const Meeting &t_meeting) {
+        if (t_meeting.getStartDate() >= start && t_meeting.getEndDate() <= end)
+        {
+            if ((t_meeting.getStartDate() >= start && t_meeting.getEndDate() <= end) || (t_meeting.getStartDate() <= start && t_meeting.getEndDate() >= start) || (t_meeting.getStartDate() <= end && t_meeting.getEndDate() >= end) || (t_meeting.getStartDate() <= start && t_meeting.getEndDate() >= end))
+                return true;
+        }
+        return false;
     };
-    return m_storage->queryMeeting(meeting_fliter);
+    ret = m_storage->queryMeeting(meeting_fliter);
+    return ret;
 }
 std::list<Meeting> AgendaService::listAllMeetings(const std::string &userName) const
 {
