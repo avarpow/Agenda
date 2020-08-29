@@ -168,7 +168,7 @@ std::list<Meeting> AgendaService::meetingQuery(const std::string &userName,
                                                const std::string &startDate,
                                                const std::string &endDate) const
 {
-    if (!Date::isValid(startDate) || !Date::isValid(endDate) || startDate > endDate)
+    if (!Date::isValid(startDate) || !Date::isValid(endDate) || startDate >= endDate)
         return std::list<Meeting>();
     auto meeting_fliter = [&userName, &startDate, &endDate](const Meeting &t_meeting) {
         return (!(t_meeting.getStartDate() > endDate) && !(t_meeting.getEndDate() < startDate)) && (t_meeting.getSponsor() == userName || t_meeting.isParticipator(userName));
@@ -197,17 +197,23 @@ std::list<Meeting> AgendaService::listAllParticipateMeetings(const std::string &
 }
 bool AgendaService::deleteMeeting(const std::string &userName, const std::string &title)
 {
-    m_storage->deleteMeeting([&userName, &title](const Meeting &t_meeting) {
+    int ret = m_storage->deleteMeeting([&userName, &title](const Meeting &t_meeting) {
         return userName == t_meeting.getSponsor() && title == t_meeting.getTitle();
     });
-    return true;
+    if (ret > 0)
+        return true;
+    else
+        return false;
 }
 bool AgendaService::deleteAllMeetings(const std::string &userName)
 {
-    m_storage->deleteMeeting([&userName](const Meeting &t_meeting) {
+    int ret = m_storage->deleteMeeting([&userName](const Meeting &t_meeting) {
         return userName == t_meeting.getSponsor();
     });
-    return true;
+    if (ret > 0)
+        return true;
+    else
+        return false;
 }
 void AgendaService::startAgenda(void)
 {
