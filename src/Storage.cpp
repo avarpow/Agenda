@@ -19,8 +19,6 @@ Storage::Storage()
         std::cout << error_str << std::endl;
     }
     m_dirty = false;
-    readFromFile();
-    m_dirty = false;
 }
 bool Storage::readFromFile(void)
 {
