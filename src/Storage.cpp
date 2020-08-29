@@ -27,7 +27,8 @@ bool Storage::readFromFile(void)
     file_user.open(Path::userPath, std::ios::in);
     if (!file_meeting.is_open() || !file_user.is_open())
     {
-        throw "Read from file fail.";
+        //throw "Read from file fail.";
+        return;
     }
     std::string user_buf;
     //read user
@@ -39,7 +40,8 @@ bool Storage::readFromFile(void)
         std::regex_match(user_buf, result_user, user_pattern);
         if (result_user.size() != 5)
         {
-            throw "file format illegal";
+            // throw "file format illegal";
+            return;
         }
         createUser(User(result_user[1], result_user[2], result_user[3], result_user[4]));
     }
@@ -81,7 +83,8 @@ bool Storage::writeToFile(void)
     file_meeting.open(Path::meetingPath, std::ios::out);
     file_user.open(Path::userPath, std::ios::out);
     if (!file_user.is_open() || !file_meeting.is_open())
-        throw "write file fail";
+        //throw "write file fail";
+        return;
     //write user file
     for (auto user : m_userList)
     {

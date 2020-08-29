@@ -2,7 +2,7 @@
 #include <iostream>
 AgendaService::AgendaService()
 {
-    std::cout<<"service start"<<std::endl;
+    std::cout << "service start" << std::endl;
     startAgenda();
 }
 AgendaService::~AgendaService()
@@ -33,7 +33,13 @@ bool AgendaService::deleteUser(const std::string &userName, const std::string &p
 {
     if (userLogIn(userName, password))
     {
+        // delete sponsor meeting
         deleteAllMeetings(userName);
+        auto part_meeting = listAllParticipateMeetings(userName);
+        for (auto meeting : part_meeting)
+        {
+            quitMeeting(userName, meeting.getTitle());
+        }
         m_storage->deleteUser([&userName](User t_user) { return t_user.getName() == userName; });
         return true;
     }
@@ -51,31 +57,35 @@ bool AgendaService::createMeeting(const std::string &userName, const std::string
     Date t_endDate(endDate);
     if (!Date::isValid(t_startDate) || !Date::isValid(t_endDate))
     {
-        std::cout << "check time fail" << std::endl;
+        //std::cout << "check time fail" << std::endl;
         return false;
     }
-    if(t_startDate>=t_endDate){
-        std::cout<<"meetings time error"<<std::endl;
+    if (t_startDate >= t_endDate)
+    {
+        //std::cout << "meetings time error" << std::endl;
         return false;
     }
     auto title_fliter = [&title](Meeting t_meeting) { return t_meeting.getTitle() == title; };
     //check all register
-    auto username_fliter = [&userName, &participator](User t_user) { 
-        if(t_user.getName()==userName)
-            return true; 
-        else{
-            for (auto &part:participator){
-                if(t_user.getName()==part){
+    auto username_fliter = [&userName, &participator](User t_user) {
+        if (t_user.getName() == userName)
+            return true;
+        else
+        {
+            for (auto &part : participator)
+            {
+                if (t_user.getName() == part)
+                {
                     return true;
                 }
             }
-                return false;
+            return false;
         }
     };
     auto time_fliter = [&t_startDate, &t_endDate](Meeting t_meeting) {
         return !((t_startDate >= t_meeting.getEndDate()) || (t_endDate <= t_meeting.getStartDate()));
     };
-    
+
     if (m_storage->queryMeeting(title_fliter).empty() &&
         m_storage->queryUser(username_fliter).size() == (participator.size() + 1) &&
         m_storage->queryMeeting(time_fliter).empty())
@@ -89,6 +99,29 @@ bool AgendaService::addMeetingParticipator(const std::string &userName,
                                            const std::string &title,
                                            const std::string &participator)
 {
+    //check username register
+    auto user_fliter = [&participator](const User &user) {
+        return participator == user.getName();
+    };
+    if (m_storage->queryUser(user_fliter).empty())
+        return false;
+
+    //check merting exist
+    auto meeting_fliter = [&title](const Meeting t_meeting) {
+        return t_meeting.getTitle() == title;
+    };
+    auto meeting_list = m_storage->queryMeeting(meeting_fliter);
+    if (meeting_list.empty())
+        return false;
+    auto the_meeting = meeting_list.front();
+    //check part time avaible
+    auto part_meetings = listAllMeetings(participator);
+    for (auto meet : part_meetings)
+    {
+        if (!(the_meeting.getEndDate() <= meet.getStartDate() || the_meeting.getStartDate() >= meet.getEndDate()))
+            return false;
+    }
+
     auto meeting_fliter = [&title, &userName](const Meeting &t_meeting) { return t_meeting.getTitle() == title && t_meeting.getSponsor() == userName; };
     auto meeting_switch = [&participator](Meeting &t_meeting) {
         t_meeting.addParticipator(participator);
@@ -109,16 +142,20 @@ bool AgendaService::removeMeetingParticipator(const std::string &userName,
 }
 bool AgendaService::quitMeeting(const std::string &userName, const std::string &title)
 {
-    auto meeting_fliter = [&title](const Meeting &t_meeting) {
-        return t_meeting.getTitle() == title;
+    auto meeting_fliter = [&title, &userName](const Meeting &t_meeting) {
+        return t_meeting.getTitle() == title && t_meeting.isParticipator(userName);
     };
     auto meeting_switcher = [&userName](Meeting &t_meeting) {
-        if (t_meeting.isParticipator(userName))
-        {
-            t_meeting.removeParticipator(userName);
-        }
+        t_meeting.removeParticipator(userName);
     };
-    m_storage->updateMeeting(meeting_fliter, meeting_switcher);
+
+    if (m_storage->updateMeeting(meeting_fliter, meeting_switcher) != 0)
+    {
+        auto empty_meeting = [](const Meeting &meeting) {
+            return meeting.getParticipator().size() == 0;
+        };
+        m_storage->deleteMeeting(empty_meeting);
+    }
     return true;
 }
 std::list<Meeting> AgendaService::meetingQuery(const std::string &userName,
@@ -133,14 +170,18 @@ std::list<Meeting> AgendaService::meetingQuery(const std::string &userName,
                                                const std::string &startDate,
                                                const std::string &endDate) const
 {
+    if (!Date::isValid(startDate) || !Date::isValid(endDate) || startDate > endDate)
+        return std::list<Meeting>();
     auto meeting_fliter = [&userName, &startDate, &endDate](const Meeting &t_meeting) {
-        return (!(t_meeting.getStartDate() > endDate) || !(t_meeting.getEndDate() > startDate)) && (t_meeting.getSponsor() == userName || t_meeting.isParticipator(userName));
+        return (!(t_meeting.getStartDate() > endDate) && !(t_meeting.getEndDate() > startDate)) && (t_meeting.getSponsor() == userName || t_meeting.isParticipator(userName));
     };
     return m_storage->queryMeeting(meeting_fliter);
 }
 std::list<Meeting> AgendaService::listAllMeetings(const std::string &userName) const
 {
-    return m_storage->queryMeeting([](const Meeting t_meeting) { return true; });
+    return m_storage->queryMeeting([userName](const Meeting t_meeting) {
+        return t_meeting.getSponsor() == userName || t_meeting.isParticipator(userName);
+    });
 }
 std::list<Meeting> AgendaService::listAllSponsorMeetings(const std::string &userName) const
 {
