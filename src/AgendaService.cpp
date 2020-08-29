@@ -100,59 +100,54 @@ bool AgendaService::createMeeting(const std::string &userName, const std::string
         return false;
     }
     auto title_fliter = [&title](Meeting t_meeting) { return t_meeting.getTitle() == title; };
-    //check part exist
-    if (participator.size() == 0)
-    {
-        return false;
-    }
+    //check all register
+    auto username_fliter = [&userName, &participator](User t_user) {
+        if (t_user.getName() == userName)
+            return true;
+        else
+        {
+            for (auto &part : participator)
+            {
+                if (t_user.getName() == part)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+    };
 
     //check title unique
-    if (!(m_storage->queryMeeting(title_fliter).empty()))
+    if (!m_storage->queryMeeting(title_fliter).empty())
     {
         return false;
     }
     //check user all register
-    /*auto username_fliter = [&userName](User t_user) {
-        if (t_user.getName() == userName)
-            return true;
-    };
-    if (m_storage->queryUser(username_fliter).size() != 1)
+    if (m_storage->queryUser(username_fliter).size() != (participator.size() + 1))
     {
         return false;
     }
+    //check participater avaliable
     for (auto &part : participator)
     {
-        auto part_fliter = [&part](User t_user) {
-            if (t_user.getName() == part)
-                return true;
-        };
-        if (m_storage->queryUser(part_fliter).size() != 1)
+        auto part_meet_list = listAllMeetings(part);
+        for (auto &meeting : part_meet_list)
         {
-            return false;
-        }
-    }*/
-
-    //check participater avaliable
-    /*for (auto &part : participator)
-    {
-        auto meet_list = listAllMeetings(part);
-        for (auto &meet : meet_list)
-        {
-            if (!(meet.getStartDate() >= endDate || meet.getEndDate() <= startDate))
+            if (!(meeting.getEndDate() <= startDate || meeting.getStartDate() >= endDate))
             {
                 return false;
             }
         }
     }
-    //check sponsor avalible
-    auto sp_meet_list = listAllMeetings(userName);
-    for (auto &meet : sp_meet_list)
+    //check sponser avalible
+    auto user_meet_list = listAllMeetings(userName);
+    for (auto &meeting : user_meet_list)
     {
-        if (!(meet.getStartDate() >= endDate || meet.getEndDate() <= startDate))
+        if (!(meeting.getEndDate() <= startDate || meeting.getStartDate() >= endDate))
         {
             return false;
         }
-    }*/
+    }
 
     m_storage->createMeeting(Meeting(userName, participator, t_startDate, t_endDate, title));
     return true;
